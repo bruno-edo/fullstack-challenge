@@ -15,21 +15,51 @@ def urls(id):
 
 @users_bp.route('/urls', methods=['POST'], strict_slashes=False)
 def urls(user_id):
-    pass
+    json_data = request.get_json(force=True)
+    url = json_data['url']
+    short_url = 'temp'
+    db_response, stats = db_client.create_new_url(url, short_url, user_id)
+
+    if db_response:
+        response = jsonify(stats)
+        response.status_code = 201
+
+    else:
+        response = Response(status=409)
+
+    return response
 
 @users_bp.route('/stats', methods=['GET'], strict_slashes=False)
 def stats(user_id): #Specific user URL stats
-    db_response = db_client.get_user_stats(user_id)
-    return 'user stats'
+    db_response, stats = db_client.get_user_stats(user_id)
+
+    if db_response:
+        response = jsonify(stats)
+        response.status_code = 200
+
+    else:
+        response = Response(status=404)
+        #response.headers['Content-Type'] = 'application/json'
+
+    return response
 
 @stats_bp.route('/', methods=['GET']) #Returns global stats
-@stats_bp.route('/<int:stats_id>', methods=['GET'], strict_slashes=False) #Returns stats from a specific URL
-def stats(stats_id=None):
-    if stats_id is None: #global
+@stats_bp.route('/<int:url_id>', methods=['GET'], strict_slashes=False) #Returns stats from a specific URL
+def stats(url_id=None):
+    if url_id is None: #global
         #return 'global stats'
         return 'Hello, world! running on %s' % request.host
 
     else: #specific
+        db_response, stats = get_url_stats(url_id)
+
+        if db_response:
+            response = jsonify(stats)
+            response.status_code = 200
+
+        else:
+            response = Response(status=404)
+
         return 'specific stats'
 
 @app.route('/users', methods=['POST'], strict_slashes=False)
@@ -45,6 +75,7 @@ def users():
 
     else: #error: already exists
         response = Response(status=409)
+        #response.headers['Content-Type'] = 'application/json'
 
     return response
 
