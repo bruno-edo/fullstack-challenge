@@ -18,7 +18,7 @@ def urls(user_id):
     pass
 
 @users_bp.route('/stats', methods=['GET'], strict_slashes=False)
-def stats(user_id):
+def stats(user_id): #Specific user URL stats
     return 'user stats'
 
 @stats_bp.route('/', methods=['GET']) #Returns global stats
@@ -56,6 +56,6 @@ app.register_blueprint(users_bp)
 app.register_blueprint(stats_bp)
 
 if __name__ == '__main__':
-    #app.config['DEBUG'] = True
-    app.run(host='localhost', port=5001)
+    app.config['DEBUG'] = True
+    app.run(host='localhost', port=5000)
     #ContentType: application/json -> para todos os métodos menos o de redirecão
