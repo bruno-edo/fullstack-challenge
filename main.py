@@ -19,13 +19,15 @@ def urls(user_id):
 
 @users_bp.route('/stats', methods=['GET'], strict_slashes=False)
 def stats(user_id): #Specific user URL stats
+    db_response = db_client.get_user_stats(user_id)
     return 'user stats'
 
 @stats_bp.route('/', methods=['GET']) #Returns global stats
 @stats_bp.route('/<int:stats_id>', methods=['GET'], strict_slashes=False) #Returns stats from a specific URL
 def stats(stats_id=None):
     if stats_id is None: #global
-        return 'global stats'
+        #return 'global stats'
+        return 'Hello, world! running on %s' % request.host
 
     else: #specific
         return 'specific stats'
@@ -34,7 +36,6 @@ def stats(stats_id=None):
 def users():
     json_data = request.get_json(force=True)
     user_id = json_data['id']
-    print(json_data)
 
     db_response = db_client.create_new_user(user_id)
 

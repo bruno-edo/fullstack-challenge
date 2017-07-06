@@ -1,4 +1,5 @@
 import sqlite3
+from sqlite3 import IntegrityError
 
 conn = sqlite3.connect('database/challenge.db')
 cursor = conn.cursor()
@@ -22,23 +23,30 @@ cursor.execute("""
     )
 """)
 
+# Save (commit) the changes
+conn.commit()
+conn.close()
+
+def get_user_stats(user_id):
+    pass
+
 def create_new_url():
     pass
 
 def create_new_user(user_id):
-    pass
-    #User = Query()
-    #query_response = users_table.search(User.user_id == user_id)
+    conn = sqlite3.connect('database/challenge.db')
+    cursor = conn.cursor()
 
-    #if len(query_response) > 0:
-    #    return False
+    try:
+        cursor.execute("""
+            INSERT INTO User (id, hits, urlCount) VALUES (?, ?, ?)
+        """, (user_id, 0, 0))
+        conn.commit()
+        conn.close()
+        return True
 
-    #else:
-    #    users_table.insert(
-    #        {
-    #            'user_id' : user_id,
-    #            'hits' : 0,
-    #            'url_count' : 0
-    #        }
-    #    )
-    #    return True
+    except IntegrityError as err:
+        print('Error. User already registered.')
+        conn.rollback()
+        conn.close()
+        return False
