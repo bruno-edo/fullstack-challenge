@@ -39,7 +39,8 @@ def users():
     db_response = db_client.create_new_user(user_id)
 
     if db_response:
-        response = Response(response=jsonify({'id' : user_id}), status=201, mimetype='application/json')
+        response = jsonify({'id' : user_id})
+        response.status_code = 201
 
     else: #error: already exists
         response = Response(status=409)
@@ -55,6 +56,6 @@ app.register_blueprint(users_bp)
 app.register_blueprint(stats_bp)
 
 if __name__ == '__main__':
-    app.config['DEBUG'] = True
-    app.run(host='localhost', port=5000)
+    #app.config['DEBUG'] = True
+    app.run(host='localhost', port=5001)
     #ContentType: application/json -> para todos os métodos menos o de redirecão

@@ -17,7 +17,7 @@ def create_new_user(user_id):
     else:
         users_table.insert(
             {
-                'user_id' : user_id.lower(),
+                'user_id' : user_id,
                 'hits' : 0,
                 'url_count' : 0
             }
