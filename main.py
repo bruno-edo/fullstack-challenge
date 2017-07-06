@@ -17,8 +17,8 @@ def urls(id):
 def urls(user_id):
     json_data = request.get_json(force=True)
     url = json_data['url']
-    short_url = 'temp'
-    db_response, stats = db_client.create_new_url(url, short_url, user_id)
+    partial_short_url = 'http://' + request.host
+    db_response, stats = db_client.create_new_url(url, partial_short_url, user_id)
 
     if db_response:
         response = jsonify(stats)

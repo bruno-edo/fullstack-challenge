@@ -1,5 +1,8 @@
 import sqlite3
+import short_url
+
 from sqlite3 import IntegrityError
+
 
 conn = sqlite3.connect('database/challenge.db')
 cursor = conn.cursor()
@@ -72,7 +75,7 @@ def get_url_stats(url_id):
         }
         return True, stats
 
-def create_new_url(url, short_url, user_id):
+def create_new_url(url, partial_short_url, user_id):
     conn = sqlite3.connect('database/challenge.db')
     conn.execute('pragma foreign_keys=ON') #Turns on foreign key constraints
     cursor = conn.cursor()
@@ -80,9 +83,18 @@ def create_new_url(url, short_url, user_id):
     try:
         cursor.execute("""
             INSERT INTO URL (hits, url, shortUrl, userId) VALUES (?, ?, ?, ?)
-        """, (0, url, short_url, user_id))
-        conn.commit()
+        """, (0, url, partial_short_url, user_id))
+
         url_id = cursor.lastrowid
+        shortened_url = str(partial_short_url + '/' + str(short_url.encode_url(url_id)))
+
+        cursor.execute("""
+            UPDATE URL
+            SET shortUrl=?
+            WHERE id=?
+            """, (shortened_url, url_id))
+
+        conn.commit()
         conn.close()
         resp, stats = get_url_stats(url_id) #Will always return the correct URL
 
