@@ -23,7 +23,7 @@ def stats(user_id):
 
 @stats_bp.route('/', methods=['GET']) #Returns global stats
 @stats_bp.route('/<int:stats_id>', methods=['GET'], strict_slashes=False) #Returns stats from a specific URL
-def global_stats(stats_id=None):
+def stats(stats_id=None):
     if stats_id is None: #global
         return 'global stats'
 
