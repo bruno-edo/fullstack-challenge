@@ -3,7 +3,7 @@ import short_url
 
 from sqlite3 import IntegrityError
 
-
+#TODO: change these commands to a setup file, that will be executed as part of the setup process
 conn = sqlite3.connect('database/challenge.db')
 cursor = conn.cursor()
 
@@ -28,6 +28,7 @@ cursor.execute("""
 conn.commit()
 conn.close()
 
+#TODO: maybe change the boolean returns to exceptions being raised
 def get_url(url_id):
     conn = sqlite3.connect('database/challenge.db')
     conn.execute('pragma foreign_keys=ON') #Turns on foreign key constraints
@@ -39,16 +40,17 @@ def get_url(url_id):
 
     data = cursor.fetchone()
 
-    cursor.execute("""UPDATE URL SET hits=hits+1 WHERE id=?
-    """, (url_id, ))
-
-    conn.commit()
-    conn.close()
-
     if data is None:
+        conn.close()
         return False, None
 
     else:
+        cursor.execute("""UPDATE URL SET hits=hits+1 WHERE id=?
+        """, (url_id, ))
+
+        conn.commit()
+        conn.close()
+
         return True, data[0]
 
 def get_top_urls(user_id=None):
@@ -90,6 +92,7 @@ def get_user_stats(user_id):
     conn.close()
 
     if data is None:
+        conn.close()
         return False, None
 
     else:
@@ -118,6 +121,7 @@ def get_url_stats(url_id):
     conn.close()
 
     if data is None:
+        conn.close()
         return False, None
 
     else:
@@ -225,6 +229,7 @@ def delete_url(url_id):
     data = cursor.fetchone()
 
     if data is None:
+        conn.close()
         raise AttributeError
 
     user_id = data[0]
