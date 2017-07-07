@@ -13,7 +13,7 @@ cursor.execute("""
         hits INTEGER NOT NULL,
         urlCount INTEGER NOT NULL
     )
-""")
+""") #TODO: hits deve passar a ser a soma de todos os hits na URLs do usuário. retirar da tabela e fazer com sum()
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS URL (
@@ -97,7 +97,7 @@ def get_user_stats(user_id): #TODO: test if top urls by user are right
         stats = {
             'id': data[0],
             'hits': data[1],
-            'urlCount': data[2]
+            'urlCount': data[2],
             'topUrls': get_top_urls(user_id)
         }
         return True, stats
