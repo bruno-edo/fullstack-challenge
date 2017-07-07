@@ -19,10 +19,15 @@ def urls(url_id):
             abort(404)
 
     else: #Delete
-        db_client.delete_url(url_id)
-        return Response(status=200)
+        try:
+            db_client.delete_url(url_id)
+            return Response(status=200)
 
-def user_urls(user_id):
+        except AttributeError as err:
+            print('URL not in database')
+            abort(404)
+
+def register_user_urls(user_id):
     json_data = request.get_json(force=True)
     url = json_data['url']
 
@@ -84,10 +89,9 @@ def register_users():
 
 #DELETE /user/:userId was the specification. Maybe they meant to utilize 'users'
 #like in the other URLs?
-def delete_url(user_id):
+def delete_user(user_id):
     db_client.delete_user(user_id)
     response = Response(status=200)
-    response.headers['Content-Type'] = 'application/json'
     return response
 
 ################################################################################
@@ -96,7 +100,7 @@ def delete_url(user_id):
 users_bp = Blueprint('users_blueprint', __name__, url_prefix='/users/<string:user_id>')
 stats_bp = Blueprint('stats_blueprint', __name__, url_prefix='/stats')
 
-users_bp.add_url_rule('/urls', view_func=user_urls, methods=['POST'], strict_slashes=False)
+users_bp.add_url_rule('/urls', view_func=register_user_urls, methods=['POST'], strict_slashes=False)
 users_bp.add_url_rule('/stats', view_func=user_stats, methods=['GET'], strict_slashes=False)
 
 stats_bp.add_url_rule('/', view_func=stats, methods=['GET']) #Returns global stats
@@ -104,7 +108,7 @@ stats_bp.add_url_rule('/<int:url_id>', view_func=stats, methods=['GET'], strict_
 
 app.add_url_rule('/urls/<int:url_id>', view_func=urls, methods=['GET', 'DELETE'], strict_slashes=False)
 app.add_url_rule('/users', view_func=register_users, methods=['POST'], strict_slashes=False)
-app.add_url_rule('/user/<string:user_id>', view_func=delete_url, methods=['DELETE'], strict_slashes=False)
+app.add_url_rule('/user/<string:user_id>', view_func=delete_user, methods=['DELETE'], strict_slashes=False)
 
 app.register_blueprint(users_bp)
 app.register_blueprint(stats_bp)

@@ -10,10 +10,9 @@ cursor = conn.cursor()
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS User (
         id TEXT NOT NULL PRIMARY KEY,
-        hits INTEGER NOT NULL,
         urlCount INTEGER NOT NULL
     )
-""") #TODO: hits deve passar a ser a soma de todos os hits na URLs do usuário. retirar da tabela e fazer com sum()
+""")
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS URL (
@@ -79,7 +78,7 @@ def get_top_urls(user_id=None):
 
     return url_list
 
-def get_user_stats(user_id): #TODO: test if top urls by user are right
+def get_user_stats(user_id):
     conn = sqlite3.connect('database/challenge.db')
     conn.execute('pragma foreign_keys=ON') #Turns on foreign key constraints
     cursor = conn.cursor()
@@ -94,12 +93,18 @@ def get_user_stats(user_id): #TODO: test if top urls by user are right
         return False, None
 
     else:
+        urls = get_top_urls(user_id)
+        hits = 0
+        for url in urls:
+            hits += int(url['hits'])
+
         stats = {
             'id': data[0],
-            'hits': data[1],
-            'urlCount': data[2],
-            'topUrls': get_top_urls(user_id)
+            'urlCount': data[1],
+            'hits': hits,
+            'topUrls': urls
         }
+
         return True, stats
 
 def get_url_stats(url_id):
@@ -147,7 +152,7 @@ def get_global_stats():
 
     return response
 
-def create_new_url(url, partial_short_url, user_id): #TODO: incremment user url count
+def create_new_url(url, partial_short_url, user_id):
     conn = sqlite3.connect('database/challenge.db')
     conn.execute('pragma foreign_keys=ON') #Turns on foreign key constraints
     cursor = conn.cursor()
@@ -163,6 +168,9 @@ def create_new_url(url, partial_short_url, user_id): #TODO: incremment user url 
         cursor.execute("""
             UPDATE URL SET shortUrl=? WHERE id=?
             """, (shortened_url, url_id))
+
+        cursor.execute("""UPDATE User SET urlCount=urlCount+1 WHERE id=?
+        """, (user_id, ))
 
         conn.commit()
         conn.close()
@@ -183,8 +191,8 @@ def create_new_user(user_id):
 
     try:
         cursor.execute("""
-            INSERT INTO User (id, hits, urlCount) VALUES (?, ?, ?)
-        """, (user_id, 0, 0))
+            INSERT INTO User (id, urlCount) VALUES (?, ?)
+        """, (user_id, 0))
         conn.commit()
         conn.close()
         return True
@@ -206,12 +214,27 @@ def delete_user(user_id):
     conn.commit()
     conn.close()
 
-def delete_url(url_id): #TODO: decrement user url count
+def delete_url(url_id):
     conn = sqlite3.connect('database/challenge.db')
     cursor = conn.cursor()
 
     cursor.execute("""
-        DELETE FROM URLs WHERE id=?
+        SELECT userId FROM URL WHERE id=?
     """, (url_id, ))
+
+    data = cursor.fetchone()
+
+    if data is None:
+        raise AttributeError
+
+    user_id = data[0]
+
+    cursor.execute("""
+        DELETE FROM URL WHERE id=?
+    """, (url_id, ))
+
+    cursor.execute("""UPDATE User SET urlCount=urlCount-1 WHERE id=?
+    """, (user_id, ))
+
     conn.commit()
     conn.close()
