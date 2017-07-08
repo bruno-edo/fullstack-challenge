@@ -9,8 +9,7 @@ cursor = conn.cursor()
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS User (
-        id TEXT NOT NULL PRIMARY KEY,
-        urlCount INTEGER NOT NULL
+        id TEXT NOT NULL PRIMARY KEY
     )
 """)
 
@@ -89,7 +88,7 @@ def get_user_stats(user_id):
         SELECT * FROM User WHERE id = ?
     """, (user_id,))
     data = cursor.fetchone()
-    conn.close()
+
 
     if data is None:
         conn.close()
@@ -103,10 +102,18 @@ def get_user_stats(user_id):
 
         stats = {
             'id': data[0],
-            'urlCount': data[1],
             'hits': hits,
             'topUrls': urls
         }
+
+        cursor.execute("""
+            SELECT count() FROM URL WHERE userId = ?
+        """, (user_id, ))
+        data = cursor.fetchone()
+        url_count = data[0]
+        conn.close()
+
+        stats['urlCount'] = url_count
 
         return True, stats
 
@@ -173,9 +180,6 @@ def create_new_url(url, partial_short_url, user_id):
             UPDATE URL SET shortUrl=? WHERE id=?
             """, (shortened_url, url_id))
 
-        cursor.execute("""UPDATE User SET urlCount=urlCount+1 WHERE id=?
-        """, (user_id, ))
-
         conn.commit()
         conn.close()
         resp, stats = get_url_stats(url_id) #Will always return the correct URL
@@ -195,8 +199,8 @@ def create_new_user(user_id):
 
     try:
         cursor.execute("""
-            INSERT INTO User (id, urlCount) VALUES (?, ?)
-        """, (user_id, 0))
+            INSERT INTO User (id) VALUES (?)
+        """, (user_id, ))
         conn.commit()
         conn.close()
         return True
@@ -223,23 +227,8 @@ def delete_url(url_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT userId FROM URL WHERE id=?
-    """, (url_id, ))
-
-    data = cursor.fetchone()
-
-    if data is None:
-        conn.close()
-        raise AttributeError
-
-    user_id = data[0]
-
-    cursor.execute("""
         DELETE FROM URL WHERE id=?
     """, (url_id, ))
-
-    cursor.execute("""UPDATE User SET urlCount=urlCount-1 WHERE id=?
-    """, (user_id, ))
 
     conn.commit()
     conn.close()
