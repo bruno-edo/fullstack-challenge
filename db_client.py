@@ -3,31 +3,7 @@ import short_url
 
 from sqlite3 import IntegrityError
 
-#TODO: change these commands to a setup file, that will be executed as part of the setup process
-conn = sqlite3.connect('database/challenge.db')
-cursor = conn.cursor()
-
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS User (
-        id TEXT NOT NULL PRIMARY KEY
-    )
-""")
-
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS URL (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        hits INTEGER NOT NULL,
-        url TEXT NOT NULL,
-        shortUrl TEXT NOT NULL,
-        userId TEXT NOT NULL,
-        FOREIGN KEY(userId) REFERENCES User(id) ON DELETE CASCADE
-    )
-""")
-
-conn.commit()
-conn.close()
-
-#TODO: maybe change the boolean returns to exceptions being raised
+#maybe change the boolean returns to exceptions being raised
 def get_url(url_id):
     conn = sqlite3.connect('database/challenge.db')
     conn.execute('pragma foreign_keys=ON') #Turns on foreign key constraints
