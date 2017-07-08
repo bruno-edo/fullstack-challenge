@@ -217,18 +217,42 @@ def delete_user(user_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-        DELETE FROM User WHERE id=?
+        SELECT EXISTS(SELECT * FROM User WHERE id=? LIMIT 1)
     """, (user_id, ))
-    conn.commit()
-    conn.close()
+
+    data = cursor.fetchone()
+
+    if bool(data[0]):
+        cursor.execute("""
+            DELETE FROM User WHERE id=?
+        """, (user_id, ))
+        conn.commit()
+        conn.close()
+        return True
+
+    else:
+        conn.close()
+        return False
 
 def delete_url(url_id):
     conn = sqlite3.connect('database/challenge.db')
     cursor = conn.cursor()
 
     cursor.execute("""
-        DELETE FROM URL WHERE id=?
+        SELECT EXISTS(SELECT * FROM URL WHERE id=? LIMIT 1)
     """, (url_id, ))
 
-    conn.commit()
-    conn.close()
+    data = cursor.fetchone()
+
+    if bool(data[0]):
+        cursor.execute("""
+            DELETE FROM URL WHERE id=?
+        """, (url_id, ))
+
+        conn.commit()
+        conn.close()
+        return True
+
+    else:
+        conn.close()
+        return False
