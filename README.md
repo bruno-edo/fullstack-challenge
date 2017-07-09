@@ -49,3 +49,21 @@ Para iniciar os servidores e passar a escutar requisições, basta apenas rodar 
 
 Testes Automatizados
 -------------------
+
+Os testes unitários estão separados em dois arquivos: **unit_test** e **test_global_stats**, localizados na pasta **tests**. A separação se deu por conta da impossibilidade de sequenciar os testes unitário de maneira confiável (utilizando a biblioteca unittests do Python).
+
+Os arquivos podem ser executados em qualquer ordem. Preferencial execute os testes antes de realizar operações manualmente, contudo não devem ocorrer erros caso se realize operações antes dos testes.
+
+Abaixo uma descrição dos arquivos:
+
+- **test_global_stats**: Executa um teste para verificar a integridade das informações das estatísticas globais;
+- **unit_test**: Executa testes diversos com as funcionalidades, como:
+    - Inserir e deletar usuário;
+    - Inserir e deletar URL;
+    - Verificar estatísticas de usuário;
+    - Teste de redireção e verificação de contagem de hits na URL;
+    - Verificação de teapot (not a coffee machine).
+
+> **NOTA:**: É necessário alterar o endereço das requisições HTTP nos arquivos de teste, de "**130.211.125.185**" para o endereço do servidor onde a aplicação foi instalada por você.
+> Caso contrário, as solicitações HTTP serão enviadas para uma máquina virtual da Google Cloud (Compute Engine), com Ubuntu 14.04 LTS instalado. A máquina em questão está rodando uma instância deste
+> webservice, e atenderá aos pedidos HTTP enviados aos endpoints.
