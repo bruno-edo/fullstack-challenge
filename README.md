@@ -52,6 +52,12 @@ Testes Automatizados
 
 Os testes unitários estão separados em dois arquivos: **unit_test** e **test_global_stats**, localizados na pasta **tests**. A separação se deu por conta da impossibilidade de sequenciar os testes unitário de maneira confiável (utilizando a biblioteca unittests do Python).
 
+É necessário instalar a biblioteca Python **Requests** para rodar os testes, para isso use o comando abaixo:
+
+```python
+    sudo pip3 install requests
+```
+
 Os arquivos podem ser executados em qualquer ordem. Preferencial execute os testes antes de realizar operações manualmente, contudo não devem ocorrer erros caso se realize operações antes dos testes.
 
 Abaixo uma descrição dos arquivos:
