@@ -65,5 +65,6 @@ Abaixo uma descrição dos arquivos:
     - Verificação de teapot (not a coffee machine).
 
 > **NOTA:**: É necessário alterar o endereço das requisições HTTP nos arquivos de teste, de "**130.211.125.185**" para o endereço do servidor onde a aplicação foi instalada por você.
+>
 > Caso contrário, as solicitações HTTP serão enviadas para uma máquina virtual da Google Cloud (Compute Engine), com Ubuntu 14.04 LTS instalado. A máquina em questão está rodando uma instância deste
 > webservice, e atenderá aos pedidos HTTP enviados aos endpoints.
